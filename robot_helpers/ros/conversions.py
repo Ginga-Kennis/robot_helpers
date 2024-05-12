@@ -2,6 +2,7 @@ import numpy as np
 
 import geometry_msgs.msg
 import sensor_msgs.msg
+from sensor_msgs.msg import PointCloud2, PointField
 from shape_msgs.msg import Mesh, MeshTriangle
 import std_msgs.msg
 
@@ -127,4 +128,37 @@ def to_vector3_msg(vector3):
     msg.x = vector3[0]
     msg.y = vector3[1]
     msg.z = vector3[2]
+    return msg
+
+def to_cloud_msg(frame, points, colors=None, intensities=None, distances=None):
+    msg = PointCloud2()
+    msg.header.frame_id = frame
+
+    msg.height = 1
+    msg.width = points.shape[0]
+    msg.is_bigendian = False
+    msg.is_dense = False
+
+    msg.fields = [
+        PointField("x", 0, PointField.FLOAT32, 1),
+        PointField("y", 4, PointField.FLOAT32, 1),
+        PointField("z", 8, PointField.FLOAT32, 1),
+    ]
+    msg.point_step = 12
+    data = points
+
+    if colors is not None:
+        raise NotImplementedError
+    elif intensities is not None:
+        msg.fields.append(PointField("intensity", 12, PointField.FLOAT32, 1))
+        msg.point_step += 4
+        data = np.hstack([points, intensities])
+    elif distances is not None:
+        msg.fields.append(PointField("distance", 12, PointField.FLOAT32, 1))
+        msg.point_step += 4
+        data = np.hstack([points, distances])
+
+    msg.row_step = msg.point_step * points.shape[0]
+    msg.data = data.astype(np.float32).tostring()
+
     return msg
