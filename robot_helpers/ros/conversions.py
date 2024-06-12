@@ -1,10 +1,12 @@
 import numpy as np
-
+import rospy
 import geometry_msgs.msg
 import sensor_msgs.msg
 from sensor_msgs.msg import PointCloud2, PointField
 from shape_msgs.msg import Mesh, MeshTriangle
 import std_msgs.msg
+from std_msgs.msg import Header
+import sensor_msgs.point_cloud2 as pcd2
 
 from robot_helpers.perception import CameraIntrinsic
 from robot_helpers.spatial import Rotation, Transform
@@ -161,4 +163,32 @@ def to_cloud_msg(frame, points, colors=None, intensities=None, distances=None):
     msg.row_step = msg.point_step * points.shape[0]
     msg.data = data.astype(np.float32).tostring()
 
+    return msg
+
+def to_colored_cloud_msg(frame ,points, stamp=None, color='blue'):
+    header = Header()
+    header.frame_id = frame
+    header.stamp = stamp or rospy.Time.now()
+
+    fields = [PointField("x", 0, PointField.FLOAT32, 1),
+              PointField("y", 4, PointField.FLOAT32, 1),
+              PointField("z", 8, PointField.FLOAT32, 1),
+              PointField("r", 12, PointField.FLOAT32, 1),
+              PointField("g", 16, PointField.FLOAT32, 1),
+              PointField("b", 20, PointField.FLOAT32, 1)]
+
+    num_points = points.shape[0]
+    
+    if color == 'green':
+        color_values = np.ones((num_points, 3)) * [0, 1, 0]
+    elif color == 'blue':
+        color_values = np.ones((num_points, 3)) * [0, 0, 1]
+    elif color == 'red':
+        color_values = np.ones((num_points, 3)) * [1, 0, 0]
+    else:
+        raise ValueError("Unsupported color specified: {}".format(color))
+
+    data = data = np.hstack((points,color_values.astype(np.float32))).astype(np.float32)
+
+    msg = pcd2.create_cloud(header=header, fields=fields, points=data)
     return msg
