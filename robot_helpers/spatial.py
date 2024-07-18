@@ -28,6 +28,10 @@ class Transform:
     @classmethod
     def from_list(cls, l):
         return cls(Rotation.from_quat(l[:4]), l[4:])
+    
+    @classmethod
+    def from_rpy(cls, l):
+        return cls(Rotation.from_euler('xyz', l[:3]), l[3:])
 
     @classmethod
     def identity(cls):
@@ -82,6 +86,9 @@ class Transform:
 
     def to_list(self):
         return np.r_[self.rotation.as_quat(), self.translation]
+
+    def to_rpy(self):
+        return np.r_[self.rotation.as_euler('xyz'), self.translation]
 
     class TClass:
         """

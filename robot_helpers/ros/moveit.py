@@ -17,22 +17,6 @@ class MoveItClient:
         _, plan = self.plan(target, velocity_scaling, acceleration_scaling)
         success = self.execute(plan)
         return success
-    
-
-    # def goto(self, target, velocity_scaling=0.1, acceleration_scaling=0.1):
-    #     success, plan = self.plan(target, velocity_scaling, acceleration_scaling)
-        
-    #     if success:
-    #         user_input = input("Plan is ready. Do you want to execute it? (y/n): ")
-    #         if user_input.lower() == 'y':
-    #             success = self.execute(plan)
-    #         else:
-    #             print("Plan execution aborted by user.")
-    #             success = False
-    #     else:
-    #         print("Failed to create a valid plan.")
-
-    #     return success
 
     def plan(self, target, velocity_scaling=0.1, acceleration_scaling=0.1):
         self.move_group.set_max_velocity_scaling_factor(velocity_scaling)
@@ -54,18 +38,6 @@ class MoveItClient:
         plan = self.planL(target, velocity_scaling, acceleration_scaling)
         success = self.execute(plan)
         return success
-    
-    # def gotoL(self, target, velocity_scaling=0.1, acceleration_scaling=0.1):
-    #     plan = self.planL(target, velocity_scaling, acceleration_scaling)
-
-    #     user_input = input("Plan is ready. Do you want to execute it? (y/n): ")
-    #     if user_input.lower() == 'y':
-    #         success = self.execute(plan)
-    #     else:
-    #         print("Plan execution aborted by user.")
-    #         success = False
-
-    #     return success
 
     def planL(self, target, velocity_scaling=0.1, acceleration_scaling=0.1):
         waypoints = [to_pose_msg(target)]
