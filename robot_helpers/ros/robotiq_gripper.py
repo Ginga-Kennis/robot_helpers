@@ -10,23 +10,20 @@ class GripperController(object):
 
     def activate_gripper(self):
         # activate
-        print("ACTIVATE GRIPPER")
         self.command = outputMsg.Robotiq2FGripper_robot_output()
         self.command.rACT = 1
         self.command.rGTO = 1
         self.command.rSP  = 255
         self.command.rFR  = 150
         self.pub.publish(self.command)
-        rospy.sleep(1.0)
 
     def gripper_control(self,width):
         # 0 < width < 140
         value = (-11/7)*width + 220
-        print(value)
         self.command.rPR = int(value)
 
         self.pub.publish(self.command)
-        rospy.sleep(1.0)
+        rospy.sleep(0.5)
         
 
 if __name__ == "__main__":
