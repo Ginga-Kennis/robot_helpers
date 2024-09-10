@@ -13,7 +13,7 @@ class MoveItClient:
         self.scene = moveit_commander.PlanningSceneInterface()
         self.move_group = moveit_commander.MoveGroupCommander(self.planning_group)
 
-    def goto(self, target, velocity_scaling=0.15, acceleration_scaling=0.15):
+    def goto(self, target, velocity_scaling=1.0, acceleration_scaling=1.0):
         _, plan = self.plan(target, velocity_scaling, acceleration_scaling)
         success = self.execute(plan)
         return success
@@ -34,7 +34,7 @@ class MoveItClient:
         success, plan, _, _ = self.move_group.plan()
         return success, plan
 
-    def gotoL(self, target, velocity_scaling=0.15, acceleration_scaling=0.15):
+    def gotoL(self, target, velocity_scaling=1.0, acceleration_scaling=1.0):
         plan = self.planL(target, velocity_scaling, acceleration_scaling)
         success = self.execute(plan)
         return success
