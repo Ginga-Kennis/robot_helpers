@@ -158,7 +158,7 @@ def to_cloud_msg(frame, points, values=None):
     data = points
 
     if values is not None:
-        msg.fields.append(PointField("value", 12, PointField.FLOAT32, 1))
+        msg.fields.append(PointField("values", 12, PointField.FLOAT32, 1))
         msg.point_step += 4
         data = np.hstack([points, values])
 
