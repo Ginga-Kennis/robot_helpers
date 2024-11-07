@@ -70,7 +70,7 @@ class Visualizer:
 
     def quality(self, frame, voxel_size, grid, threshold=0.9):
         points, values = grid_to_map_cloud(voxel_size, grid, threshold)
-        msg = to_cloud_msg(frame, points, intensities=values)
+        msg = to_cloud_msg(frame, points, values=values)
         self.quality_pub.publish(msg)
 
     def grasp(self, frame, grasp, quality, vmin=0.5, vmax=1.0):
