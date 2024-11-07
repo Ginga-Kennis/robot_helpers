@@ -1,13 +1,11 @@
 import numpy as np
-import rospy
 import ros_numpy
 import geometry_msgs.msg
 import sensor_msgs.msg
 from sensor_msgs.msg import PointCloud2, PointField
 from shape_msgs.msg import Mesh, MeshTriangle
 import std_msgs.msg
-from std_msgs.msg import Header
-import sensor_msgs.point_cloud2 as pcd2
+
 
 from robot_helpers.perception import CameraIntrinsic
 from robot_helpers.spatial import Rotation, Transform
