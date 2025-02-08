@@ -52,6 +52,10 @@ class Visualizer:
         markers = [Marker(action=Marker.DELETE, ns="grasp", id=i) for i in range(4)]
         self.draw(markers)
 
+    def clear_ig_views(self):
+        markers = [Marker(action=Marker.DELETE, ns="ig_view", id=i) for i in range(24)]
+        self.draw(markers)
+
     def roi(self, frame, size):
         pose = Transform.identity()
         scale = [size * 0.005, 0.0, 0.0]
@@ -83,6 +87,14 @@ class Visualizer:
             color = cm((quality - vmin) / (vmax - vmin))
             markers.append(create_grasp_marker(frame, grasp, color, "grasps", i))
         self.draw(markers)
+
+    def ig_view(self, frame, intrinsic, view, value, vmin=0.0, vmax=0.8):
+        scale = [0.002, 0.0, 0.0]
+        near, far = 0.0, 0.02
+        color = cm((value - vmin) / (vmax - vmin))
+        marker = create_view_marker(
+            frame, view, scale, color, intrinsic, near, far, ns="ig_view", id=0)
+        self.draw([marker])
 
     def draw(self, markers):
         self.marker_pub.publish(MarkerArray(markers=markers))
@@ -129,6 +141,44 @@ def create_grasp_marker(frame, grasp, color, ns, id=0, depth=0.05, radius=0.005)
     pose, w, d, scale = grasp.pose, grasp.width, depth, [radius, 0.0, 0.0]
     points = [[0, -w / 2, d], [0, -w / 2, 0], [0, w / 2, 0], [0, w / 2, d]]
     return create_line_strip_marker(frame, pose, scale, color, points, ns, id)
+
+
+def create_view_marker(frame, pose, scale, color, intrinsic, near, far, ns="", id=0):
+    marker = create_marker(Marker.LINE_LIST, frame, pose, scale, color, ns, id)
+    x_n = near * intrinsic.width / (2.0 * intrinsic.fx)
+    y_n = near * intrinsic.height / (2.0 * intrinsic.fy)
+    z_n = near
+    x_f = far * intrinsic.width / (2.0 * intrinsic.fx)
+    y_f = far * intrinsic.height / (2.0 * intrinsic.fy)
+    z_f = far
+    points = [
+        [x_n, y_n, z_n],
+        [-x_n, y_n, z_n],
+        [-x_n, y_n, z_n],
+        [-x_n, -y_n, z_n],
+        [-x_n, -y_n, z_n],
+        [x_n, -y_n, z_n],
+        [x_n, -y_n, z_n],
+        [x_n, y_n, z_n],
+        [x_f, y_f, z_f],
+        [-x_f, y_f, z_f],
+        [-x_f, y_f, z_f],
+        [-x_f, -y_f, z_f],
+        [-x_f, -y_f, z_f],
+        [x_f, -y_f, z_f],
+        [x_f, -y_f, z_f],
+        [x_f, y_f, z_f],
+        [x_n, y_n, z_n],
+        [x_f, y_f, z_f],
+        [-x_n, y_n, z_n],
+        [-x_f, y_f, z_f],
+        [-x_n, -y_n, z_n],
+        [-x_f, -y_f, z_f],
+        [x_n, -y_n, z_n],
+        [x_f, -y_f, z_f],
+    ]
+    marker.points = [to_point_msg(p) for p in points]
+    return marker
 
 
 def create_arrow_marker(frame, start, end, scale, color, ns="", id=0):
